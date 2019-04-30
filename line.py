@@ -38,6 +38,17 @@ stream = p.open(
     frames_per_buffer=chunk
 )
 
+pp = pyaudio.PyAudio()
+out = pp.open(
+    format=pyaudio.paInt16,
+    channels=1,
+    rate=44100,
+    #input=True,
+    output=True,
+    input_device_index=12, #0 laptop ,1 loopback , 3 fejes
+    frames_per_buffer=chunk
+    )
+
 #for i in range(p.get_device_count()):
 #    print(f'{i} {p.get_device_info_by_index(i)["name"]}')
 
@@ -49,7 +60,7 @@ while not done:
             done = True
 
     temp = stream.read(chunk)
-    #stream.write(temp)
+    out.write(temp)
     data = struct.unpack(f"{str(2*chunk)}B", temp)
 
     screen.fill(BLACK)
