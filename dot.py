@@ -1,20 +1,20 @@
 import pygame as pygame
+from pygame import gfxdraw
 import pyaudio
 import struct
 import time
-from pygame import gfxdraw
 
 # Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 #SETTINGS
-size = (512, 256)
+size = (1024, 256)
 chunk = 1024
 stepsize = 1
-filter_255 = True
+filter_255 = False
 filter_2 = True
-max_fps = 60
+max_fps = 30
 width_of_col = 1
 scale = 1
 skip_under = 0
@@ -27,7 +27,6 @@ done = False
 clock = pygame.time.Clock()
 
 
-
 p = pyaudio.PyAudio()
 stream = p.open(
     format=pyaudio.paInt16,
@@ -35,6 +34,8 @@ stream = p.open(
     rate=44100,
     input=True,
     output=True,
+    as_loopback=True,
+    input_device_index=1, #0 laptop , 3 fejes
     frames_per_buffer=chunk
 )
 

@@ -2,21 +2,24 @@ import pygame as pygame
 import pyaudio
 import struct
 import time
+import wave
 
 # Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 #SETTINGS
-size = (1024, 256)
+size = (512, 256)
 chunk = 1024
 stepsize = 1
-filter_255 = False
+filter_255 = True
 filter_2 = True
-max_fps = 30
+max_fps = 60
 width_of_col = 1
 scale = 1
 skip_under = 0
+file_path = "./File0161.wav"
+
 
 #Init
 pygame.init()
@@ -25,21 +28,16 @@ pygame.display.set_caption("AV")
 done = False
 clock = pygame.time.Clock()
 
+wf = wave.open(file_path, "rb")
 
 p = pyaudio.PyAudio()
 stream = p.open(
-    format=pyaudio.paInt16,
-    channels=1,
-    rate=44100,
-    input=True,
+    format=p.get_format_from_width(wf.getsampwidth()),
+    channels=wf.getnchannels(),
+    rate=wf.getframerate(),
     output=True,
-    as_loopback=True,
-    input_device_index=1, #0 laptop ,1 loopback , 3 fejes
-    frames_per_buffer=chunk
+    input=True
 )
-
-#for i in range(p.get_device_count()):
-#    print(f'{i} {p.get_device_info_by_index(i)["name"]}')
 
 
 while not done:
@@ -48,9 +46,14 @@ while not done:
         if event.type == pygame.QUIT:
             done = True
 
-    temp = stream.read(chunk)
-    #stream.write(temp)
-    data = struct.unpack(f"{str(2*chunk)}B", temp)
+    temp = wf.readframes(chunk)
+
+    if len(temp) < 4096:
+        done = True
+        break
+
+    data = struct.unpack(f"{str(4*chunk)}B", temp)
+    stream.write(temp)
 
     screen.fill(BLACK)
 
